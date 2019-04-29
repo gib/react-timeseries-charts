@@ -47,12 +47,12 @@ function mergeStyles(style, isCentered) {
  * Renders a simple label surrounded by a box within in svg
  *
  *      +----------------+
+ *      | Event Time     |
  *      | My label       |
- *      |                |
  *      +----------------+
  */
 
-const Label = ({ label, style, align, width, height }) => {
+const Label = ({ label, style, align, width, height, time }) => {
     const { boxStyle, labelStyle } = mergeStyles(style, align === "center");
 
     const posx = align === "center" ? parseInt(width / 2, 10) : 10;
@@ -68,6 +68,9 @@ const Label = ({ label, style, align, width, height }) => {
     return (
         <g>
             {box}
+            <text x={posx} y={5} dy="1.2em" style={labelStyle}>
+                {time}
+            </text>
             {text}
         </g>
     );
@@ -105,7 +108,8 @@ Label.propTypes = {
     /**
      * The height of the rectangle to render into
      */
-    height: PropTypes.number
+    height: PropTypes.number,
+    time: PropTypes.string.isRequired
 };
 
 export default Label;

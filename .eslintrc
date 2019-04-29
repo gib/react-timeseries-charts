@@ -1,6 +1,19 @@
 {
-  "extends": "react-app",
+  "extends": [
+    "react-app",
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ],
   "rules": {
     "import/no-webpack-loader-syntax": "off"
+  },
+  "plugins": [
+    "react"
+  ],
+  "settings": {
+    "react": {
+      "pragma": "React",
+      "version": "16.3"
+    }
   }
 }

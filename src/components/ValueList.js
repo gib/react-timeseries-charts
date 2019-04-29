@@ -15,15 +15,16 @@ import PropTypes from "prop-types";
  * Renders a list of values in svg
  *
  *      +----------------+
+ *      | Event Time     |
  *      | Max 100 Gbps   |
  *      | Avg 26 Gbps    |
  *      +----------------+
  */
 const ValueList = props => {
-    const { align, style, width, height } = props;
+    const { align, style, width, height, time } = props;
 
-    if (!props.values.length) {
-        return <g />;
+    if (props.values[0].label !== "___EVENT_TIME___") {
+        props.values.unshift({ label: "___EVENT_TIME___", value: time });
     }
 
     const textStyle = {
@@ -41,6 +42,15 @@ const ValueList = props => {
     };
 
     const values = props.values.map((item, i) => {
+        if (i === 0) {
+            return (
+                <g key={i}>
+                    <text x={10} y={5} dy={`${(i + 1) * 1.2}em`} style={textStyle}>
+                        <tspan>{`${item.value}`}</tspan>
+                    </text>
+                </g>
+            );
+        }
         if (align === "left") {
             return (
                 <g key={i}>
@@ -107,7 +117,8 @@ ValueList.propTypes = {
     /**
      * The height of the rectangle to render into
      */
-    height: PropTypes.number
+    height: PropTypes.number,
+    time: PropTypes.string.isRequired
 };
 
 export default ValueList;
