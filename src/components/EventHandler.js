@@ -55,7 +55,7 @@ export default class EventHandler extends React.Component {
     //
 
     handleScrollWheel(e) {
-        if (!this.props.enablePanZoom && !this.props.enableDragZoom) {
+        if (!this.props.enablePanZoom) {
             return;
         }
 
@@ -85,8 +85,8 @@ export default class EventHandler extends React.Component {
         if (this.props.minDuration) {
             const minDuration = parseInt(this.props.minDuration, 10);
             if (duration < this.props.minDuration) {
-                beginScaled = center - (center - begin) / (end - begin) * minDuration;
-                endScaled = center + (end - center) / (end - begin) * minDuration;
+                beginScaled = center - ((center - begin) / (end - begin)) * minDuration;
+                endScaled = center + ((end - center) / (end - begin)) * minDuration;
             }
         }
 

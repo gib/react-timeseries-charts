@@ -12,76 +12,11 @@ import _ from "underscore";
 import React from "react";
 import PropTypes from "prop-types";
 import merge from "merge";
-import { TimeEvent, TimeRangeEvent, IndexedEvent } from "pondjs";
+import { TimeEvent, TimeRangeEvent, IndexedEvent, Index, TimeRange } from "pondjs";
 import { timeFormat } from "d3-time-format";
 
 import Label from "./Label";
 import ValueList from "./ValueList";
-
-// const EventTime = ({ time, format = "%m/%d/%y %X" }) => {
-//     const textStyle = {
-//         fontSize: 11,
-//         textAnchor: "left",
-//         fill: "#bdbdbd",
-//         pointerEvents: "none"
-//     };
-//
-//     let text = EventTimeToString(time, format);
-//
-//     return (
-//         <text x={0} y={0} dy="1.2em" style={textStyle}>{text}</text>
-//     );
-// };
-// EventTime.propTypes = {
-//     time: PropTypes.instanceOf(Date),
-//     format: PropTypes.oneOfType([PropTypes.func, PropTypes.string])
-// };
-// EventTime.defaultProps = {
-//     infoTimeFormat: "%m/%d/%y %X"
-// };
-
-// const EventTimeRange = ({ timerange, format = "%m/%d/%y %X" }) => {
-//     const textStyle = {
-//         fontSize: 11,
-//         textAnchor: "left",
-//         fill: "#bdbdbd",
-//         pointerEvents: "none"
-//     };
-//
-//     let text = EventTimeToString(timerange, "range", format);
-//     return (
-//         <text x={0} y={0} dy="1.2em" style={textStyle} textValue={text}>
-//             {text}
-//         </text>
-//     );
-// };
-// EventTimeRange.propTypes = {
-//     timerange: PropTypes.instanceOf(TimeRange),
-//     format: PropTypes.oneOfType([PropTypes.func, PropTypes.string])
-// };
-// EventTimeRange.defaultProps = {
-//     infoTimeFormat: "%m/%d/%y %X"
-// };
-
-// const EventIndex = ({ index, format }) => {
-//     const textStyle = {
-//         fontSize: 11,
-//         textAnchor: "left",
-//         fill: "#bdbdbd",
-//         pointerEvents: "none"
-//     };
-//
-//     let text = EventTimeToString(index, "index", format);
-//     return (
-//         <text x={0} y={0} dy="1.2em" style={textStyle} textValue={text}>
-//             {text}
-//         </text>
-//     );
-// };
-// EventIndex.propTypes = {
-//     index: PropTypes.instanceOf(Index),
-//     format: PropTypes.oneOfType([PropTypes.func, PropTypes.string])
-// };
 
 /**
  * Renders a marker at a specific event on the chart.
@@ -96,8 +31,8 @@ import ValueList from "./ValueList";
  *    the marker. The label can be aligned with markerAlign and also
  *    styled with markerLabelStyle
  *  * the "info box" which is a box containing values that hovers that the
- *    top of the chart. Optionally it can show the time above the box.
- *    The values themselves are supplied as an array of objects using
+ *    top of the chart. Optionally it can show the time above the box or in the
+ *    box. The values themselves are supplied as an array of objects using
  *    the `info` prop. The info box can be styled with `infoStyle`,
  *    sized with `infoWidth` and `infoHeight`, and the time formatted
  *    with `infoTimeFormat`
@@ -114,70 +49,90 @@ import ValueList from "./ValueList";
  * override either the x or y position by a number of pixels.
  */
 export default class EventMarker extends React.Component {
-    // renderTime(event) {
-    //     if (event instanceof TimeEvent) {
-    //         return <EventTime time={event.timestamp()} format={this.props.infoTimeFormat} />;
-    //     } else if (event instanceof IndexedEvent) {
-    //         return <EventIndex index={event.index()} format={this.props.infoTimeFormat} />;
-    //     } else if (event instanceof TimeRangeEvent) {
-    //         return (
-    //             <EventTimeRange timerange={event.timerange()} format={this.props.infoTimeFormat} />
-    //         );
-    //     }
-    // }
-
-    renderTimeValue(event, format = "%m/%d/%y %X") {
-        let text = "";
-
-        if (event instanceof TimeRangeEvent) {
-            const d1 = event.timerange.begin();
-            const d2 = event.timerange.end();
-
-            let beginText;
-            let endText;
-
-            if (_.isFunction(format)) {
-                beginText = format(d1);
-                endText = format(d2);
-            } else {
-                const fmt = timeFormat(format);
-                beginText = fmt(d1);
-                endText = fmt(d2);
-            }
-            text = `${beginText} to ${endText}`;
-        } else if (event instanceof IndexedEvent) {
-            if (_.isFunction(format)) {
-                text = format(event.index());
-            } else if (_.isString(format)) {
-                const fmt = timeFormat(format);
-                text = fmt(event.index().begin());
-            } else {
-                text = event.index().toString();
-            }
-        } else if (event instanceof TimeEvent) {
-            if (_.isFunction(format)) {
-                text = format(event.timestamp());
-            } else {
-                const fmt = timeFormat(format);
-                text = fmt(event.timestamp());
-            }
+    indexValue(index, format = "%m/%d/%y %X") {
+        if (_.isFunction(format)) {
+            return format(index);
         }
-        return text;
+        if (_.isString(format)) {
+            const fmt = timeFormat(format);
+            return fmt(index.begin());
+        }
+        return index.toString();
+    }
+
+    timeRangeValue(timerange, format = "%m/%d/%y %X") {
+        const d1 = timerange.begin();
+        const d2 = timerange.end();
+
+        let beginText;
+        let endText;
+
+        if (_.isFunction(format)) {
+            beginText = format(d1);
+            endText = format(d2);
+        } else {
+            const fmt = timeFormat(format);
+            beginText = fmt(d1);
+            endText = fmt(d2);
+        }
+        return `${beginText} to ${endText}`;
+    }
+
+    timeValue(time, format = "%m/%d/%y %X") {
+        if (_.isFunction(format)) {
+            return format(time);
+        }
+        const fmt = timeFormat(format);
+        return fmt(time);
+    }
+
+    timeForType(event) {
+        if (event instanceof TimeEvent) {
+            return this.timeValue(this.props.infoTimeFormat);
+        }
+        if (event instanceof IndexedEvent) {
+            return this.indexValue(event.index(), this.props.infoTimeFormat);
+        }
+        if (event instanceof TimeRangeEvent) {
+            return this.timeValue(event.timerange(), this.props.infoTimeFormat);
+        }
+        // pass through
+        return "";
+    }
+
+    renderTime(event) {
+        const textStyle = {
+            fontSize: 11,
+            textAnchor: "left",
+            fill: "#bdbdbd",
+            pointerEvents: "none"
+        };
+        let text = this.timeForType(event);
+
+        if (!text) {
+            return <g />;
+        }
+
+        return (
+            <text x={0} y={0} dy="1.2em" style={textStyle}>
+                {text}
+            </text>
+        );
     }
 
     renderInfoBox(event, info, props) {
-        let infoBox = <g />;
-        //let renderedTime = this.renderTime(event) || "time";
-        let renderedTime = this.renderTimeValue(event, this.props.infoTimeFormat);
-
+        let time = "";
         if (info) {
+            if (this.props.infoTimeInBox) {
+                time = this.timeForType(event);
+            }
             if (_.isString(this.props.info)) {
-                infoBox = <Label {...props} label={info} time={renderedTime} />;
+                return <Label {...props} label={info} time={time} />;
             } else {
-                infoBox = <ValueList {...props} values={info} time={renderedTime} />;
+                return <ValueList {...props} values={info} time={time} />;
             }
         }
-        return infoBox;
+        return <g />;
     }
 
     renderMarker(event, column, info) {
@@ -195,6 +150,11 @@ export default class EventMarker extends React.Component {
             value = this.props.yValueFunc(event, column);
         } else {
             value = event.get(column);
+        }
+
+        let timeStamp;
+        if (!this.props.infoTimeInBox) {
+            timeStamp = this.renderTime(event);
         }
 
         // Allow overrides on the x and y position. This is useful for the barchart
@@ -359,6 +319,7 @@ export default class EventMarker extends React.Component {
                     {verticalStem}
                     {horizontalStem}
                     {dot}
+                    {timeStamp}
                     <g transform={`translate(0,${20})`}>
                         {this.renderInfoBox(event, info, infoBoxProps)}
                     </g>
@@ -442,6 +403,13 @@ EventMarker.propTypes = {
     infoTimeFormat: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
 
     /**
+     * Place the timestamp inside the infobox default is above the box
+     * when you may not need a box, but still want the timestamp. This Will
+     * also support only a timestamp in the infobox.
+     */
+    infoTimeInBox: PropTypes.bool,
+
+    /**
      * Show a label to the left or right of the marker
      */
     markerLabelAlign: PropTypes.oneOf(["left", "right", "top", "bottom"]),
@@ -499,6 +467,7 @@ EventMarker.defaultProps = {
         stroke: "#999",
         pointerEvents: "none"
     },
+    infoTimeInBox: false,
     stemStyle: {
         stroke: "#999",
         cursor: "crosshair",

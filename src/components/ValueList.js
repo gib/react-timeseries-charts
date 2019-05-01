@@ -23,6 +23,7 @@ import PropTypes from "prop-types";
 const ValueList = props => {
     const { align, style, width, height, time } = props;
 
+    // Add timestamp if supplied
     if (props.values[0].label !== "___EVENT_TIME___") {
         props.values.unshift({ label: "___EVENT_TIME___", value: time });
     }
@@ -78,6 +79,7 @@ const ValueList = props => {
     return (
         <g>
             {box}
+            {time}
             {values}
         </g>
     );

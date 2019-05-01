@@ -355,9 +355,9 @@ BarChart.propTypes = {
 
     /**
      * A list of columns within the series that will be stacked on top of each other
-     * 
-     * NOTE : Columns can't have periods because periods 
-     * represent a path to deep data in the underlying events 
+     *
+     * NOTE : Columns can't have periods because periods
+     * represent a path to deep data in the underlying events
      * (i.e. reference into nested data structures)
      */
     columns: PropTypes.arrayOf(PropTypes.string),
@@ -450,6 +450,13 @@ BarChart.propTypes = {
         PropTypes.string, //eslint-disable-line
         PropTypes.func //eslint-disable-line
     ]),
+
+    /**
+     * Place the timestamp inside the infobox default is above the box
+     * when you may not need a box, but still want the timestamp. This Will
+     * also support only a timestamp in the infobox.
+     */
+    infoTimeInBox: PropTypes.bool, //eslint-disable-line
 
     /**
      * The radius of the infoBox dot at the end of the marker

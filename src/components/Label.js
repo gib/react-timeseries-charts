@@ -57,20 +57,27 @@ const Label = ({ label, style, align, width, height, time }) => {
 
     const posx = align === "center" ? parseInt(width / 2, 10) : 10;
 
+    const box = <rect x={0} y={0} style={boxStyle} width={width} height={height} />;
+
+    let timeStamp = "";
+    if (time) {
+        timeStamp = (
+            <text x={posx} y={5} dy="1.2em" style={labelStyle}>
+                {time}
+            </text>
+        );
+    }
+
     const text = (
         <text x={posx} y={5} dy="1.2em" style={labelStyle}>
             {label}
         </text>
     );
 
-    const box = <rect x={0} y={0} style={boxStyle} width={width} height={height} />;
-
     return (
         <g>
             {box}
-            <text x={posx} y={5} dy="1.2em" style={labelStyle}>
-                {time}
-            </text>
+            {timeStamp}
             {text}
         </g>
     );
@@ -109,7 +116,11 @@ Label.propTypes = {
      * The height of the rectangle to render into
      */
     height: PropTypes.number,
-    time: PropTypes.string.isRequired
+
+    /**
+     * Optional timestamp value to go inside the infobox
+     */
+    time: PropTypes.string
 };
 
 export default Label;
