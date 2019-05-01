@@ -154,7 +154,7 @@ class volume extends React.Component {
 
     render() {
         /*
-        
+
         Styling the hard way
 
         const style = {
@@ -174,7 +174,7 @@ class volume extends React.Component {
                 muted: {fill: "#FFCC9E", opacity: 0.4}
             }
         };
-       
+
         const combinedStyle = {
             in: {
                 normal: {fill: "#A5C8E1"},
@@ -273,6 +273,8 @@ class volume extends React.Component {
                                             infoTimeFormat={index =>
                                                 moment(index.begin()).format("Do MMM 'YY")
                                             }
+                                            infoTimeInBox
+                                            infoHeight={40}
                                             highlighted={this.state.highlight}
                                             onHighlightChange={highlight =>
                                                 this.setState({ highlight })
@@ -287,7 +289,7 @@ class volume extends React.Component {
                                         id="traffic-rate"
                                         label="Avg Traffic Rate In (bps)"
                                         min={0}
-                                        max={max / (24 * 60 * 60) * 8}
+                                        max={(max / (24 * 60 * 60)) * 8}
                                         width="70"
                                     />
                                 </ChartRow>
@@ -333,6 +335,8 @@ class volume extends React.Component {
                                             highlighted={this.state.highlight}
                                             info={infoValues}
                                             infoTimeFormat="%m/%d/%y"
+                                            infoTimeInBox
+                                            infoHeight={40}
                                             onHighlightChange={highlight =>
                                                 this.setState({ highlight })
                                             }
@@ -349,6 +353,9 @@ class volume extends React.Component {
                                             columns={["out"]}
                                             series={octoberTrafficSeries}
                                             info={infoValues}
+                                            infoTimeInBox
+                                            infoHeight={40}
+                                            infoWidth={140}
                                             highlighted={this.state.highlight}
                                             onHighlightChange={highlight =>
                                                 this.setState({ highlight })
@@ -399,6 +406,9 @@ class volume extends React.Component {
                                             columns={["in", "out"]}
                                             series={octoberTrafficSeries}
                                             info={infoValues}
+                                            infoHeight={40}
+                                            infoWidth={140}
+                                            infoTimeInBox
                                             highlighted={this.state.highlight}
                                             onHighlightChange={highlight =>
                                                 this.setState({ highlight })

@@ -24,7 +24,7 @@ const ValueList = props => {
     const { align, style, width, height, time } = props;
 
     // Add timestamp if supplied
-    if (props.values[0].label !== "___EVENT_TIME___") {
+    if (time && props.values[0].label !== "___EVENT_TIME___") {
         props.values.unshift({ label: "___EVENT_TIME___", value: time });
     }
 
@@ -43,7 +43,7 @@ const ValueList = props => {
     };
 
     const values = props.values.map((item, i) => {
-        if (i === 0) {
+        if (i === 0 && item.label === "___EVENT_TIME___") {
             return (
                 <g key={i}>
                     <text x={10} y={5} dy={`${(i + 1) * 1.2}em`} style={textStyle}>

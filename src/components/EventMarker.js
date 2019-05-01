@@ -12,7 +12,7 @@ import _ from "underscore";
 import React from "react";
 import PropTypes from "prop-types";
 import merge from "merge";
-import { TimeEvent, TimeRangeEvent, IndexedEvent, Index, TimeRange } from "pondjs";
+import { TimeEvent, TimeRangeEvent, IndexedEvent } from "pondjs";
 import { timeFormat } from "d3-time-format";
 
 import Label from "./Label";
@@ -123,7 +123,7 @@ export default class EventMarker extends React.Component {
     renderInfoBox(event, info, props) {
         let time = "";
         if (info) {
-            if (this.props.infoTimeInBox) {
+            if (props.timeInBox) {
                 time = this.timeForType(event);
             }
             if (_.isString(this.props.info)) {
@@ -135,7 +135,7 @@ export default class EventMarker extends React.Component {
         return <g />;
     }
 
-    renderMarker(event, column, info) {
+    renderMarker(event, column, info, timeInBox) {
         let t;
         if (event instanceof TimeEvent) {
             t = event.timestamp();
@@ -152,11 +152,6 @@ export default class EventMarker extends React.Component {
             value = event.get(column);
         }
 
-        let timeStamp;
-        if (!this.props.infoTimeInBox) {
-            timeStamp = this.renderTime(event);
-        }
-
         // Allow overrides on the x and y position. This is useful for the barchart
         // tracker because bars maybe be offset from their actual event position in
         // order to display them side by side.
@@ -167,7 +162,8 @@ export default class EventMarker extends React.Component {
             align: "left",
             style: this.props.infoStyle,
             width: this.props.infoWidth,
-            height: this.props.infoHeight
+            height: this.props.infoHeight,
+            timeInBox: timeInBox
         };
 
         const w = this.props.infoWidth;
@@ -314,6 +310,11 @@ export default class EventMarker extends React.Component {
                 transform = `translate(${posx - w - 10},${10})`;
             }
 
+            let timeStamp = "";
+            if (!timeInBox) {
+                timeStamp = this.renderTime(event);
+            }
+
             return (
                 <g transform={transform}>
                     {verticalStem}
@@ -329,11 +330,11 @@ export default class EventMarker extends React.Component {
     }
 
     render() {
-        const { event, column, info } = this.props;
+        const { event, column, info, infoTimeInBox } = this.props;
         if (!event) {
             return <g />;
         }
-        return <g>{this.renderMarker(event, column, info)}</g>;
+        return <g>{this.renderMarker(event, column, info, infoTimeInBox)}</g>;
     }
 }
 
